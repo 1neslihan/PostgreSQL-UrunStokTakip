@@ -61,6 +61,7 @@ namespace PostgreSQL_UrunTakipSistemi
             DataSet ds3 = new DataSet();
             da3.Fill(ds3);
             dataGridView3.DataSource=ds3.Tables[0];
+            dataGridView3.Columns[6].Visible = false;
             dataGridView3.RowsDefaultCellStyle.BackColor = Color.AliceBlue;
             dataGridView3.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
 
@@ -83,7 +84,7 @@ namespace PostgreSQL_UrunTakipSistemi
                 komut3.ExecuteNonQuery();
                 baglanti.Close();
             }
-            void KayıtEkle(int selectedId, string selectedAd, int selectedStok, int selectedAlisFiyat, int selectedSatisFiyat,
+            void KayıtEkle(string selectedAd, int selectedStok, int selectedAlisFiyat, int selectedSatisFiyat,
                 string selectedGorsel, int selectedKategori)
             {
                 NpgsqlCommand komut2 = new NpgsqlCommand("insert into silinenUrunler (" +
@@ -168,7 +169,7 @@ namespace PostgreSQL_UrunTakipSistemi
                         string selectedGorsel = Convert.ToString(drow.Cells[5].Value);
                         int selectedKategori = Convert.ToInt32(drow.Cells[6].Value);
 
-                        KayıtEkle(selectedId, selectedAd, selectedStok, selectedAlisFiyat, selectedSatisFiyat, selectedGorsel, selectedKategori);
+                        KayıtEkle(selectedAd, selectedStok, selectedAlisFiyat, selectedSatisFiyat, selectedGorsel, selectedKategori);
                         KayıtSil(selectedId);
                     }
 
@@ -336,6 +337,123 @@ namespace PostgreSQL_UrunTakipSistemi
 
         private void btnGeriYukle_Click(object sender, EventArgs e)
         {
+            void KayıtSil(int selectedId)
+            {
+                NpgsqlCommand komut6 = new NpgsqlCommand("delete from silinenurunler where silinenurunid=@p1", baglanti);
+                komut6.Parameters.AddWithValue("@p1", selectedId);
+                baglanti.Open();
+                komut6.ExecuteNonQuery();
+                baglanti.Close();
+            }
+            void KayıtEkle(string selectedAd, int selectedStok, int selectedAlisFiyat, int selectedSatisFiyat,
+                string selectedGorsel, int selectedKategori)
+            {
+                NpgsqlCommand komut5 = new NpgsqlCommand("insert into urunler (" +
+                    "urunad," +
+                    "stok," +
+                    "alisfiyat," +
+                    "satisfiyat," +
+                    "gorsel," +
+                    "kategori ) " +
+                    "values (" +
+                    "@p1," +
+                    "@p2," +
+                    "@p3," +
+                    "@p4," +
+                    "@p5," +
+                    "@p6)", baglanti);
+
+                komut5.Parameters.AddWithValue("@p1", selectedAd);
+                komut5.Parameters.AddWithValue("@p2", selectedStok);
+
+                if (selectedAlisFiyat==-1)
+                {
+                    komut5.Parameters.AddWithValue("@p3", DBNull.Value);
+                }
+                else
+                {
+                    komut5.Parameters.AddWithValue("@p3", selectedAlisFiyat);
+                }
+
+                if (selectedSatisFiyat==-1)
+                {
+                    komut5.Parameters.AddWithValue("@p4", DBNull.Value);
+                }
+                else
+                {
+                    komut5.Parameters.AddWithValue("@p4", selectedSatisFiyat);
+                }
+
+                komut5.Parameters.AddWithValue("@p5", selectedGorsel);
+                komut5.Parameters.AddWithValue("@p6", selectedKategori);
+
+                baglanti.Open();
+                komut5.ExecuteNonQuery(); 
+                baglanti.Close();
+            }
+
+            int kategoriKarsilastir(int selectedKategori)
+            {
+                NpgsqlCommand karsilastir = new NpgsqlCommand("select silinenurunad from silinenurunler s " +
+                        "where exists(select 1 from kategoriler k where k.kategoriid=s.silinenkategori and silinenkategori=@d)", baglanti);
+                karsilastir.Parameters.AddWithValue("@d", selectedKategori);
+                baglanti.Open();
+
+                karsilastir.ExecuteScalar();
+                if ((string)karsilastir.ExecuteScalar()==null)
+                    selectedKategori=20;
+                baglanti.Close();
+                return selectedKategori;
+            }
+
+            int selectedRowCount = dataGridView3.Rows.GetRowCount(DataGridViewElementStates.Selected);
+            if (selectedRowCount > 0)
+            {
+                foreach (DataGridViewRow drow in dataGridView3.SelectedRows)  //Seçili Satırları ana tabloya geri ekleme
+                {
+                    int selectedId = Convert.ToInt32(drow.Cells[6].Value);
+                    string selectedAd = Convert.ToString(drow.Cells[0].Value);
+                    int selectedStok = Convert.ToInt32(drow.Cells[1].Value);
+                    int selectedAlisFiyat;  // int selectedAlisFiyat = Convert.ToInt32(drow.Cells[3].Value);
+                    if (drow.Cells[2].Value==DBNull.Value)
+                    {
+                        selectedAlisFiyat=-1;
+                    }
+                    else
+                    {
+                        selectedAlisFiyat=Convert.ToInt32(drow.Cells[2].Value);
+                    }
+
+                    int selectedSatisFiyat;  //int selectedSatisFiyat = Convert.ToInt32(drow.Cells[4].Value);
+                    if (drow.Cells[3].Value== DBNull.Value)
+                    {
+                        selectedSatisFiyat=-1;
+                    }
+                    else
+                    {
+                        selectedSatisFiyat = Convert.ToInt32(drow.Cells[3].Value);
+                    }
+
+
+                    string selectedGorsel = Convert.ToString(drow.Cells[4].Value);
+
+                    
+                    int selectedKategori = Convert.ToInt32(drow.Cells[5].Value);
+                    
+                    selectedKategori=kategoriKarsilastir(selectedKategori);
+                    KayıtEkle(selectedAd,selectedStok,selectedAlisFiyat,selectedSatisFiyat,selectedGorsel,selectedKategori);
+                    KayıtSil(selectedId);
+                      
+                    
+                }
+                MessageBox.Show("Geri yükleme tamamlandı.","Bilgi",MessageBoxButtons.OK, MessageBoxIcon.Information);
+                btnListele_Click(sender, e);
+            }
+            else if(selectedRowCount==0)
+            {
+                MessageBox.Show("Geri yüklemek istediğiniz satır veya satırları seçiniz.","Bilgi",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            }
+
 
         }
     }

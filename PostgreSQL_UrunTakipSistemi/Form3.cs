@@ -16,7 +16,15 @@ namespace PostgreSQL_UrunTakipSistemi
         public Form3()
         {
             InitializeComponent();
+            FormClosing +=Form3_FormClosing;
         }
+
+        private void Form3_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Form pop = new Form2();
+            pop.ShowDialog();
+        }
+
         NpgsqlConnection baglanti = new NpgsqlConnection("server=localhost; port=5432; " +
            "Database=dburunler; user Id=postgres; password=*****");
 
@@ -35,7 +43,11 @@ namespace PostgreSQL_UrunTakipSistemi
             dataGridView1.Columns["kategoriid"].ReadOnly=true;
             dataGridView1.RowsDefaultCellStyle.BackColor = Color.Bisque;
             dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
+            
+
         }
+
+        
         private void Listele()
         {
             string sorgu = "select * from kategoriler";
@@ -48,7 +60,7 @@ namespace PostgreSQL_UrunTakipSistemi
             dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
 
         }
-
+        
         private void btnEkle_Click(object sender, EventArgs e)
         {
             baglanti.Open();
@@ -66,12 +78,74 @@ namespace PostgreSQL_UrunTakipSistemi
             
             baglanti.Close();
             txtKategoriAd.Clear();
-            Listele();
-
+            Listele();          
+           
         }
+  
+        
 
         private void btnSil_Click(object sender, EventArgs e)
         {
+            void KategoriSil(int selectedId)
+            {
+                NpgsqlCommand komut3 = new NpgsqlCommand("delete from kategoriler where kategoriid=@p1", baglanti);
+                komut3.Parameters.AddWithValue("@p1", selectedId);
+                baglanti.Open();
+                komut3.ExecuteNonQuery();
+                baglanti.Close();
+            }
+            void KategoriUpdate(int selectedId)
+            {
+                NpgsqlCommand komut2 = new NpgsqlCommand("update urunler set kategori=20 where kategori=@p1", baglanti);
+
+                komut2.Parameters.AddWithValue("@p1", selectedId);
+               
+                baglanti.Open();
+                komut2.ExecuteNonQuery();
+                baglanti.Close();
+            }
+
+            int selectedRowCount = dataGridView1.Rows.GetRowCount(DataGridViewElementStates.Selected);
+
+            if (selectedRowCount > 0)
+            {
+
+                DialogResult dialogresult = MessageBox.Show("kategoriyi silmek istediğinize emin misiniz?"
+                    , "Bilgi", MessageBoxButtons.YesNo, MessageBoxIcon.Stop);
+                if (dialogresult == DialogResult.Yes)
+                {
+
+                    foreach (DataGridViewRow drow in dataGridView1.SelectedRows)  //Seçili Satırları Silme ve Yeni Tabloya ekleme
+                    {
+                        int selectedId= Convert.ToInt32(drow.Cells[0].Value);
+                        if (selectedId != 20)
+                        {
+                            KategoriUpdate(selectedId);
+                            KategoriSil(selectedId);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Bilinmeyen kategorisi silinemez!");
+                        }
+                     
+                        
+                    }
+
+                    
+                    Listele();
+                }
+
+                else if (dialogresult == DialogResult.No)
+                {
+                    MessageBox.Show("Silme işlemi iptal edildi");
+                }
+
+            }
+            else if (selectedRowCount<=0)
+            {
+                MessageBox.Show("Lütfen tablodan silinecek elemanı/elemanları seçin");
+            }
+
 
         }
     }

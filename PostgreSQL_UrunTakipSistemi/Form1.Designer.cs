@@ -42,10 +42,11 @@ namespace PostgreSQL_UrunTakipSistemi
             this.label6 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.dataGridView3 = new System.Windows.Forms.DataGridView();
-            this.btnKaliciSilme = new System.Windows.Forms.Button();
-            this.btnCopBosalt = new System.Windows.Forms.Button();
             this.btnGeriYukle = new System.Windows.Forms.Button();
+            this.btnCopBosalt = new System.Windows.Forms.Button();
+            this.btnKaliciSilme = new System.Windows.Forms.Button();
+            this.dataGridView3 = new System.Windows.Forms.DataGridView();
+            this.label1 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
@@ -183,6 +184,7 @@ namespace PostgreSQL_UrunTakipSistemi
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.label1);
             this.tabPage2.Controls.Add(this.btnGeriYukle);
             this.tabPage2.Controls.Add(this.btnCopBosalt);
             this.tabPage2.Controls.Add(this.btnKaliciSilme);
@@ -193,28 +195,18 @@ namespace PostgreSQL_UrunTakipSistemi
             this.tabPage2.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage2.Size = new System.Drawing.Size(1282, 471);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Kategori";
+            this.tabPage2.Text = "Çöp Kutusu";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // dataGridView3
+            // btnGeriYukle
             // 
-            this.dataGridView3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView3.Location = new System.Drawing.Point(26, 35);
-            this.dataGridView3.Name = "dataGridView3";
-            this.dataGridView3.RowHeadersWidth = 51;
-            this.dataGridView3.RowTemplate.Height = 24;
-            this.dataGridView3.Size = new System.Drawing.Size(787, 327);
-            this.dataGridView3.TabIndex = 0;
-            // 
-            // btnKaliciSilme
-            // 
-            this.btnKaliciSilme.Location = new System.Drawing.Point(929, 55);
-            this.btnKaliciSilme.Name = "btnKaliciSilme";
-            this.btnKaliciSilme.Size = new System.Drawing.Size(238, 52);
-            this.btnKaliciSilme.TabIndex = 1;
-            this.btnKaliciSilme.Text = "Kalıcı Sil";
-            this.btnKaliciSilme.UseVisualStyleBackColor = true;
-            this.btnKaliciSilme.Click += new System.EventHandler(this.btnKaliciSilme_Click);
+            this.btnGeriYukle.Location = new System.Drawing.Point(929, 331);
+            this.btnGeriYukle.Name = "btnGeriYukle";
+            this.btnGeriYukle.Size = new System.Drawing.Size(238, 52);
+            this.btnGeriYukle.TabIndex = 3;
+            this.btnGeriYukle.Text = "Geri Yükle";
+            this.btnGeriYukle.UseVisualStyleBackColor = true;
+            this.btnGeriYukle.Click += new System.EventHandler(this.btnGeriYukle_Click);
             // 
             // btnCopBosalt
             // 
@@ -226,15 +218,36 @@ namespace PostgreSQL_UrunTakipSistemi
             this.btnCopBosalt.UseVisualStyleBackColor = true;
             this.btnCopBosalt.Click += new System.EventHandler(this.btnCopBosalt_Click);
             // 
-            // btnGeriYukle
+            // btnKaliciSilme
             // 
-            this.btnGeriYukle.Location = new System.Drawing.Point(929, 331);
-            this.btnGeriYukle.Name = "btnGeriYukle";
-            this.btnGeriYukle.Size = new System.Drawing.Size(238, 52);
-            this.btnGeriYukle.TabIndex = 3;
-            this.btnGeriYukle.Text = "Geri Yükle";
-            this.btnGeriYukle.UseVisualStyleBackColor = true;
-            this.btnGeriYukle.Click += new System.EventHandler(this.btnGeriYukle_Click);
+            this.btnKaliciSilme.Location = new System.Drawing.Point(929, 55);
+            this.btnKaliciSilme.Name = "btnKaliciSilme";
+            this.btnKaliciSilme.Size = new System.Drawing.Size(238, 52);
+            this.btnKaliciSilme.TabIndex = 1;
+            this.btnKaliciSilme.Text = "Kalıcı Sil";
+            this.btnKaliciSilme.UseVisualStyleBackColor = true;
+            this.btnKaliciSilme.Click += new System.EventHandler(this.btnKaliciSilme_Click);
+            // 
+            // dataGridView3
+            // 
+            this.dataGridView3.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridView3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView3.Location = new System.Drawing.Point(26, 35);
+            this.dataGridView3.Name = "dataGridView3";
+            this.dataGridView3.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.dataGridView3.RowHeadersWidth = 51;
+            this.dataGridView3.RowTemplate.Height = 24;
+            this.dataGridView3.Size = new System.Drawing.Size(787, 327);
+            this.dataGridView3.TabIndex = 0;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(491, 415);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(53, 20);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "label1";
             // 
             // Form1
             // 
@@ -253,6 +266,7 @@ namespace PostgreSQL_UrunTakipSistemi
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView3)).EndInit();
             this.ResumeLayout(false);
 
@@ -272,11 +286,11 @@ namespace PostgreSQL_UrunTakipSistemi
         private System.Windows.Forms.Button btnListele;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.DataGridView dataGridView2;
-        private System.Windows.Forms.Button btnKaliciSil;
         private System.Windows.Forms.DataGridView dataGridView3;
         private Button btnKaliciSilme;
         private Button btnCopBosalt;
         private Button btnGeriYukle;
+        private Label label1;
     }
 }
 

@@ -46,15 +46,14 @@ namespace PostgreSQL_UrunTakipSistemi
             toolTip1.SetToolTip(this.button1, "Yeni kategori eklemek için tıklayın");
             toolTip1.ToolTipIcon = ToolTipIcon.Info;
             toolTip1.IsBalloon= true;
-            toolTip1.ToolTipTitle = "Nasıl Kategori Düzenlerim?";
-
-
-
+            toolTip1.ToolTipTitle = "Nasıl Kategori Düzenlerim?";           
+       
         }
+        
 
         private void btnEkle_Click(object sender, EventArgs e)
         {
-            baglanti.Open();
+            
             NpgsqlCommand komut = new NpgsqlCommand("insert into urunler (urunad,stok,alisfiyat," +
                 "satisfiyat,gorsel,kategori) values (@p1,@p2,@p3,@p4,@p5,@p6)", baglanti);
             
@@ -92,8 +91,9 @@ namespace PostgreSQL_UrunTakipSistemi
 
             komut.Parameters.AddWithValue("@p5", txtGorsel.Text);
             komut.Parameters.AddWithValue("@p6", int.Parse(comKategori.SelectedValue.ToString()));
+            baglanti.Open();
             komut.ExecuteNonQuery();
-            
+            baglanti.Close();
             DialogResult dialogresult = MessageBox.Show("Veri ekleme başarılı.Veri eklemeye devam etmek iste misiniz?"
                    , "Bilgi", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dialogresult == DialogResult.Yes)
@@ -112,14 +112,19 @@ namespace PostgreSQL_UrunTakipSistemi
                 //MessageBox.Show("Silme işlemi iptal edildi");
                 this.Close();
             }
-            baglanti.Close();
+            
 
         }
+        
+        
+   
 
         private void button1_Click(object sender, EventArgs e)
         {
             Form frm3=new Form3();
-            frm3.ShowDialog();    
+            this.Close();
+            frm3.ShowDialog();
+            
 
         }
     }

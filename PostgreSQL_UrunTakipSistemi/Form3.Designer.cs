@@ -33,7 +33,7 @@
             this.btnEkle = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.btnSil = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
+            this.btnGuncelle = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -73,6 +73,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(310, 185);
             this.dataGridView1.TabIndex = 3;
             // 
@@ -86,21 +87,22 @@
             this.btnSil.UseVisualStyleBackColor = true;
             this.btnSil.Click += new System.EventHandler(this.btnSil_Click);
             // 
-            // button3
+            // btnGuncelle
             // 
-            this.button3.Location = new System.Drawing.Point(380, 205);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(94, 28);
-            this.button3.TabIndex = 5;
-            this.button3.Text = "Güncelle";
-            this.button3.UseVisualStyleBackColor = true;
+            this.btnGuncelle.Location = new System.Drawing.Point(380, 205);
+            this.btnGuncelle.Name = "btnGuncelle";
+            this.btnGuncelle.Size = new System.Drawing.Size(94, 28);
+            this.btnGuncelle.TabIndex = 5;
+            this.btnGuncelle.Text = "Güncelle";
+            this.btnGuncelle.UseVisualStyleBackColor = true;
+            this.btnGuncelle.Click += new System.EventHandler(this.btnGuncelle_Click);
             // 
             // Form3
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 22F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(499, 353);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.btnGuncelle);
             this.Controls.Add(this.btnSil);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.btnEkle);
@@ -125,6 +127,6 @@
         private System.Windows.Forms.Button btnEkle;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Button btnSil;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button btnGuncelle;
     }
 }

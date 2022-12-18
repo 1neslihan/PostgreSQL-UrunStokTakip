@@ -58,7 +58,8 @@ namespace PostgreSQL_UrunTakipSistemi
             dataGridView1.Columns["kategoriid"].ReadOnly=true;
             dataGridView1.RowsDefaultCellStyle.BackColor = Color.Bisque;
             dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
-
+            
+            
         }
         
         private void btnEkle_Click(object sender, EventArgs e)
@@ -115,7 +116,7 @@ namespace PostgreSQL_UrunTakipSistemi
                 if (dialogresult == DialogResult.Yes)
                 {
 
-                    foreach (DataGridViewRow drow in dataGridView1.SelectedRows)  //Seçili Satırları Silme ve Yeni Tabloya ekleme
+                    foreach (DataGridViewRow drow in dataGridView1.SelectedRows)  
                     {
                         int selectedId= Convert.ToInt32(drow.Cells[0].Value);
                         if (selectedId != 20)
@@ -147,6 +148,40 @@ namespace PostgreSQL_UrunTakipSistemi
             }
 
 
+        }
+
+        private void btnGuncelle_Click(object sender, EventArgs e)
+        {
+            NpgsqlCommand kategoriadDBGuncelle = new NpgsqlCommand("update kategoriler set kategoriad=@p1 where kategoriid=@p2", baglanti);
+           
+            foreach(DataGridViewRow upt3 in dataGridView1.SelectedRows)
+            {
+                
+
+                if (upt3.Cells[0].Value != null)
+                {
+                    kategoriadDBGuncelle.Parameters.AddWithValue("@p2", upt3.Cells[0].Value);
+                }
+                else
+                {
+                    MessageBox.Show("Hatalı seçim", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                
+                if(upt3.Cells[1].Value != null)
+                {
+                    kategoriadDBGuncelle.Parameters.AddWithValue("@p1", upt3.Cells[1].Value);
+                }
+                else
+                {
+                    MessageBox.Show("Kategori ismi boş olamaz!", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
+
+                baglanti.Open();
+                kategoriadDBGuncelle.ExecuteNonQuery();
+                baglanti.Close();
+                Listele();
+            }
         }
     }
 }

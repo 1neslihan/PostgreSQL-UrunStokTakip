@@ -34,7 +34,7 @@ namespace PostgreSQL_UrunTakipSistemi
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.label8 = new System.Windows.Forms.Label();
-            this.btnAra = new System.Windows.Forms.Button();
+            this.btnFiltre = new System.Windows.Forms.Button();
             this.btnGuncelle = new System.Windows.Forms.Button();
             this.btnSil = new System.Windows.Forms.Button();
             this.btnEkle = new System.Windows.Forms.Button();
@@ -42,11 +42,14 @@ namespace PostgreSQL_UrunTakipSistemi
             this.label6 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
             this.btnGeriYukle = new System.Windows.Forms.Button();
             this.btnCopBosalt = new System.Windows.Forms.Button();
             this.btnKaliciSilme = new System.Windows.Forms.Button();
             this.dataGridView3 = new System.Windows.Forms.DataGridView();
-            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
@@ -69,9 +72,12 @@ namespace PostgreSQL_UrunTakipSistemi
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.label4);
+            this.tabPage1.Controls.Add(this.label3);
+            this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.dataGridView2);
             this.tabPage1.Controls.Add(this.label8);
-            this.tabPage1.Controls.Add(this.btnAra);
+            this.tabPage1.Controls.Add(this.btnFiltre);
             this.tabPage1.Controls.Add(this.btnGuncelle);
             this.tabPage1.Controls.Add(this.btnSil);
             this.tabPage1.Controls.Add(this.btnEkle);
@@ -108,14 +114,15 @@ namespace PostgreSQL_UrunTakipSistemi
             this.label8.TabIndex = 20;
             this.label8.Text = "Veri Tabanı";
             // 
-            // btnAra
+            // btnFiltre
             // 
-            this.btnAra.Location = new System.Drawing.Point(1134, 352);
-            this.btnAra.Name = "btnAra";
-            this.btnAra.Size = new System.Drawing.Size(126, 32);
-            this.btnAra.TabIndex = 19;
-            this.btnAra.Text = "Ara";
-            this.btnAra.UseVisualStyleBackColor = true;
+            this.btnFiltre.Location = new System.Drawing.Point(1134, 352);
+            this.btnFiltre.Name = "btnFiltre";
+            this.btnFiltre.Size = new System.Drawing.Size(126, 32);
+            this.btnFiltre.TabIndex = 19;
+            this.btnFiltre.Text = "Filtrele";
+            this.btnFiltre.UseVisualStyleBackColor = true;
+            this.btnFiltre.Click += new System.EventHandler(this.btnFiltre_Click);
             // 
             // btnGuncelle
             // 
@@ -198,6 +205,15 @@ namespace PostgreSQL_UrunTakipSistemi
             this.tabPage2.Text = "Çöp Kutusu";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(491, 415);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(53, 20);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "label1";
+            // 
             // btnGeriYukle
             // 
             this.btnGeriYukle.Location = new System.Drawing.Point(929, 331);
@@ -240,14 +256,32 @@ namespace PostgreSQL_UrunTakipSistemi
             this.dataGridView3.Size = new System.Drawing.Size(787, 327);
             this.dataGridView3.TabIndex = 0;
             // 
-            // label1
+            // label2
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(491, 415);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 20);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "label1";
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(27, 411);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(53, 20);
+            this.label2.TabIndex = 22;
+            this.label2.Text = "label2";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(131, 411);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(53, 20);
+            this.label3.TabIndex = 23;
+            this.label3.Text = "label3";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(244, 411);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(53, 20);
+            this.label4.TabIndex = 24;
+            this.label4.Text = "label4";
             // 
             // Form1
             // 
@@ -279,7 +313,7 @@ namespace PostgreSQL_UrunTakipSistemi
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.Button btnAra;
+        private System.Windows.Forms.Button btnFiltre;
         private System.Windows.Forms.Button btnGuncelle;
         private System.Windows.Forms.Button btnSil;
         private System.Windows.Forms.Button btnEkle;
@@ -291,6 +325,9 @@ namespace PostgreSQL_UrunTakipSistemi
         private Button btnCopBosalt;
         private Button btnGeriYukle;
         private Label label1;
+        private Label label4;
+        private Label label3;
+        private Label label2;
     }
 }
 

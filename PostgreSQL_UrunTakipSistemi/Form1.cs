@@ -27,7 +27,7 @@ namespace PostgreSQL_UrunTakipSistemi
         private void Form1_Load(object sender, EventArgs e)
         {
           
-            btnListele_Click(sender, e);
+           btnListele_Click(sender, e);
 
         }
 
@@ -53,6 +53,8 @@ namespace PostgreSQL_UrunTakipSistemi
             DataSet ds2 = new DataSet();
             da2.Fill(ds2);
             dataGridView2.DataSource= ds2.Tables[0];
+            dataGridView2.Columns["Kategori_Kod"].ReadOnly=true;
+            dataGridView2.Columns["kategoriad"].ReadOnly=true;
             dataGridView2.RowsDefaultCellStyle.BackColor = Color.Bisque;
             dataGridView2.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
 
@@ -64,6 +66,9 @@ namespace PostgreSQL_UrunTakipSistemi
             dataGridView3.Columns[6].Visible = false;
             dataGridView3.RowsDefaultCellStyle.BackColor = Color.AliceBlue;
             dataGridView3.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
+
+         
+            
 
         }
         private void btnEkle_Click(object sender, EventArgs e)
@@ -140,34 +145,34 @@ namespace PostgreSQL_UrunTakipSistemi
                 if (dialogresult == DialogResult.Yes)
                 {
                     
-                    foreach (DataGridViewRow drow in dataGridView1.SelectedRows)  //Seçili Satırları Silme ve Yeni Tabloya ekleme
+                    foreach (DataGridViewRow del in dataGridView1.SelectedRows)  //Seçili Satırları Silme ve Yeni Tabloya ekleme
                     {
-                        int selectedId = Convert.ToInt32(drow.Cells[0].Value);
-                        string selectedAd = Convert.ToString(drow.Cells[1].Value);
-                        int selectedStok = Convert.ToInt32(drow.Cells[2].Value);     
+                        int selectedId = Convert.ToInt32(del.Cells[0].Value);
+                        string selectedAd = Convert.ToString(del.Cells[1].Value);
+                        int selectedStok = Convert.ToInt32(del.Cells[2].Value);     
                         int selectedAlisFiyat;// int selectedAlisFiyat = Convert.ToInt32(drow.Cells[3].Value);
-                        if (drow.Cells[3].Value==DBNull.Value)
+                        if (del.Cells[3].Value==DBNull.Value)
                         {
                             selectedAlisFiyat=-1;
                         }
                         else
                         {
-                            selectedAlisFiyat=Convert.ToInt32(drow.Cells[3].Value);
+                            selectedAlisFiyat=Convert.ToInt32(del.Cells[3].Value);
                         }
 
                         int selectedSatisFiyat;//int selectedSatisFiyat = Convert.ToInt32(drow.Cells[4].Value);
-                        if(drow.Cells[4].Value== DBNull.Value)
+                        if(del.Cells[4].Value== DBNull.Value)
                         {
                             selectedSatisFiyat=-1;
                         }
                         else
                         {
-                            selectedSatisFiyat = Convert.ToInt32(drow.Cells[4].Value);
+                            selectedSatisFiyat = Convert.ToInt32(del.Cells[4].Value);
                         }
                      
                         
-                        string selectedGorsel = Convert.ToString(drow.Cells[5].Value);
-                        int selectedKategori = Convert.ToInt32(drow.Cells[6].Value);
+                        string selectedGorsel = Convert.ToString(del.Cells[5].Value);
+                        int selectedKategori = Convert.ToInt32(del.Cells[6].Value);
 
                         KayıtEkle(selectedAd, selectedStok, selectedAlisFiyat, selectedSatisFiyat, selectedGorsel, selectedKategori);
                         KayıtSil(selectedId);
@@ -192,68 +197,68 @@ namespace PostgreSQL_UrunTakipSistemi
         private void btnGuncelle_Click(object sender, EventArgs e)
         {
 
-            for (int item = 0; item<dataGridView1.Rows.Count; item++)
+            foreach (DataGridViewRow upt in dataGridView1.SelectedRows)
             {
                 NpgsqlCommand komut4 = new NpgsqlCommand("Update urunler set urunad=@p1, stok=@p2, alisfiyat=@p3," +
                     "satisfiyat=@p4, gorsel=@p5, kategori=@p6 where urunid=@p7",baglanti);
 
-                if (dataGridView1.Rows[item].Cells[1].Value !=null)
+                if (upt.Cells[1].Value !=null)
                 {
-                    komut4.Parameters.AddWithValue("@p1", dataGridView1.Rows[item].Cells[1].Value);
+                    komut4.Parameters.AddWithValue("@p1", upt.Cells[1].Value);
                 }
                 else
                 {
                     komut4.Parameters.AddWithValue("@p1",DBNull.Value);
                 }
 
-                if (dataGridView1.Rows[item].Cells[2].Value !=null)
+                if (upt.Cells[2].Value !=null)
                 {
-                    komut4.Parameters.AddWithValue("@p2", dataGridView1.Rows[item].Cells[2].Value);
+                    komut4.Parameters.AddWithValue("@p2", upt.Cells[2].Value);
                 }
                 else
                 {
                     komut4.Parameters.AddWithValue("@p2", DBNull.Value);
                 }
 
-                if (dataGridView1.Rows[item].Cells[3].Value !=null)
+                if (upt.Cells[3].Value !=null)
                 {
-                    komut4.Parameters.AddWithValue("@p3", dataGridView1.Rows[item].Cells[3].Value);
+                    komut4.Parameters.AddWithValue("@p3", upt.Cells[3].Value);
                 }
                 else
                 {
                     komut4.Parameters.AddWithValue("@p3", DBNull.Value);
                 }
 
-                if (dataGridView1.Rows[item].Cells[4].Value !=null)
+                if (upt.Cells[4].Value !=null)
                 {
-                    komut4.Parameters.AddWithValue("@p4", dataGridView1.Rows[item].Cells[4].Value);
+                    komut4.Parameters.AddWithValue("@p4", upt.Cells[4].Value);
                 }
                 else
                 {
                     komut4.Parameters.AddWithValue("@p4", DBNull.Value);
                 }
 
-                if (dataGridView1.Rows[item].Cells[5].Value !=null)
+                if (upt.Cells[5].Value !=null)
                 {
-                    komut4.Parameters.AddWithValue("@p5", dataGridView1.Rows[item].Cells[5].Value);
+                    komut4.Parameters.AddWithValue("@p5", upt.Cells[5].Value);
                 }
                 else
                 {
                     komut4.Parameters.AddWithValue("@p5", DBNull.Value);
                 }
 
-                if (dataGridView1.Rows[item].Cells[6].Value !=null)
+                if (upt.Cells[6].Value !=null)
                 {
-                    komut4.Parameters.AddWithValue("@p6", dataGridView1.Rows[item].Cells[6].Value);
+                    komut4.Parameters.AddWithValue("@p6", upt.Cells[6].Value);
                 }
                 else
                 {
                     komut4.Parameters.AddWithValue("@p6", DBNull.Value);
                 }
 
-                if (dataGridView1.Rows[item].Cells[0].Value !=null)
+                if (upt.Cells[0].Value !=null)
                 {
-                    komut4.Parameters.AddWithValue("@p7", dataGridView1.Rows[item].Cells[0].Value);
+                    komut4.Parameters.AddWithValue("@p7", upt.Cells[0].Value);
                 }
                 else
                 {
@@ -312,9 +317,9 @@ namespace PostgreSQL_UrunTakipSistemi
                     , "Bilgi", MessageBoxButtons.YesNo, MessageBoxIcon.Stop);
                 if (dialogresult==DialogResult.Yes)
                 {
-                    foreach (DataGridViewRow drow in dataGridView3.SelectedRows)  //Seçili Satırları Silme ve Yeni Tabloya ekleme
+                    foreach (DataGridViewRow harddel in dataGridView3.SelectedRows)  //Seçili Satırları Silme ve Yeni Tabloya ekleme
                     {
-                        int selectedId = Convert.ToInt32(drow.Cells[6].Value);
+                        int selectedId = Convert.ToInt32(harddel.Cells[6].Value);
                         KayıtSil(selectedId);
 
                     }
@@ -409,36 +414,36 @@ namespace PostgreSQL_UrunTakipSistemi
             int selectedRowCount = dataGridView3.Rows.GetRowCount(DataGridViewElementStates.Selected);
             if (selectedRowCount > 0)
             {
-                foreach (DataGridViewRow drow in dataGridView3.SelectedRows)  //Seçili Satırları ana tabloya geri ekleme
+                foreach (DataGridViewRow restore in dataGridView3.SelectedRows)  //Seçili Satırları ana tabloya geri ekleme
                 {
-                    int selectedId = Convert.ToInt32(drow.Cells[6].Value);
-                    string selectedAd = Convert.ToString(drow.Cells[0].Value);
-                    int selectedStok = Convert.ToInt32(drow.Cells[1].Value);
+                    int selectedId = Convert.ToInt32(restore.Cells[6].Value);
+                    string selectedAd = Convert.ToString(restore.Cells[0].Value);
+                    int selectedStok = Convert.ToInt32(restore.Cells[1].Value);
                     int selectedAlisFiyat;  // int selectedAlisFiyat = Convert.ToInt32(drow.Cells[3].Value);
-                    if (drow.Cells[2].Value==DBNull.Value)
+                    if (restore.Cells[2].Value==DBNull.Value)
                     {
                         selectedAlisFiyat=-1;
                     }
                     else
                     {
-                        selectedAlisFiyat=Convert.ToInt32(drow.Cells[2].Value);
+                        selectedAlisFiyat=Convert.ToInt32(restore.Cells[2].Value);
                     }
 
                     int selectedSatisFiyat;  //int selectedSatisFiyat = Convert.ToInt32(drow.Cells[4].Value);
-                    if (drow.Cells[3].Value== DBNull.Value)
+                    if (restore.Cells[3].Value== DBNull.Value)
                     {
                         selectedSatisFiyat=-1;
                     }
                     else
                     {
-                        selectedSatisFiyat = Convert.ToInt32(drow.Cells[3].Value);
+                        selectedSatisFiyat = Convert.ToInt32(restore.Cells[3].Value);
                     }
 
 
-                    string selectedGorsel = Convert.ToString(drow.Cells[4].Value);
+                    string selectedGorsel = Convert.ToString(restore.Cells[4].Value);
 
                     
-                    int selectedKategori = Convert.ToInt32(drow.Cells[5].Value);
+                    int selectedKategori = Convert.ToInt32(restore.Cells[5].Value);
                     
                     selectedKategori=kategoriKarsilastir(selectedKategori);
                     KayıtEkle(selectedAd,selectedStok,selectedAlisFiyat,selectedSatisFiyat,selectedGorsel,selectedKategori);
@@ -456,5 +461,47 @@ namespace PostgreSQL_UrunTakipSistemi
 
 
         }
+
+        public int alisFiyatBaslangic { get; set; }
+        public int alisFiyatBitis { get; set; }
+        public int satisFiyatBaslangic { get; set; }
+        public int satisFiyatBitis { get; set; }
+        public string kategoriBilgisi { get; set; }
+        public string urunAdı { get; set; }
+       // {
+            //get { return label2.Text; }
+            //set { label2.Text = value; } 
+       // }
+        public bool secili { get; set; }
+        public int flag=0;
+
+        string sorgu;
+        public void filtre()
+        {
+            sorgu = "select * from urunler where ";
+            if(urunAdı !=null)
+            {
+                sorgu=sorgu+"urunAd=@p1";
+            }
+            label3.Text=sorgu;
+            label2.Text=urunAdı;
+        }
+        
+
+        private void btnFiltre_Click(object sender, EventArgs e)
+        {
+            Form frm4=new Form4(this);
+          
+            frm4.Show();
+            
+
+            
+            
+            
+            
+            
+
+        }
+        
     }
 }

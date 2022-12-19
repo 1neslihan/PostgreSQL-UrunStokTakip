@@ -19,6 +19,12 @@ namespace PostgreSQL_UrunTakipSistemi
             InitializeComponent();
        
         }
+        //private Form4 filtreleForm = null;
+        //public Form1(Form callingForm)
+        //{
+        //    filtreleForm = callingForm as Form4;
+        //    InitializeComponent();
+        //}
 
         NpgsqlConnection baglanti = new NpgsqlConnection("server=localhost; port=5432; " +
             "Database=dburunler; user Id=postgres; password=*****");
@@ -419,7 +425,7 @@ namespace PostgreSQL_UrunTakipSistemi
                     int selectedId = Convert.ToInt32(restore.Cells[6].Value);
                     string selectedAd = Convert.ToString(restore.Cells[0].Value);
                     int selectedStok = Convert.ToInt32(restore.Cells[1].Value);
-                    int selectedAlisFiyat;  // int selectedAlisFiyat = Convert.ToInt32(drow.Cells[3].Value);
+                    int selectedAlisFiyat;  
                     if (restore.Cells[2].Value==DBNull.Value)
                     {
                         selectedAlisFiyat=-1;
@@ -429,7 +435,7 @@ namespace PostgreSQL_UrunTakipSistemi
                         selectedAlisFiyat=Convert.ToInt32(restore.Cells[2].Value);
                     }
 
-                    int selectedSatisFiyat;  //int selectedSatisFiyat = Convert.ToInt32(drow.Cells[4].Value);
+                    int selectedSatisFiyat;  
                     if (restore.Cells[3].Value== DBNull.Value)
                     {
                         selectedSatisFiyat=-1;
@@ -462,44 +468,173 @@ namespace PostgreSQL_UrunTakipSistemi
 
         }
 
-        public int alisFiyatBaslangic { get; set; }
-        public int alisFiyatBitis { get; set; }
-        public int satisFiyatBaslangic { get; set; }
-        public int satisFiyatBitis { get; set; }
+        public string alisFiyatBaslangic { get; set; }
+        public string alisFiyatBitis { get; set; }
+        public string satisFiyatBaslangic { get; set; }
+        public string satisFiyatBitis { get; set; }
         public string kategoriBilgisi { get; set; }
         public string urunAdı { get; set; }
-       // {
-            //get { return label2.Text; }
-            //set { label2.Text = value; } 
-       // }
         public bool secili { get; set; }
-        public int flag=0;
+        
 
-        string sorgu;
+      
         public void filtre()
         {
-            sorgu = "select * from urunler where ";
-            if(urunAdı !=null)
+           
+            string sorgu = "select urunler.urunid,urunler.urunad As Urun_Ad, urunler.stok, urunler.alisfiyat As Alis_Fiyat," +
+                "urunler.satisfiyat As Satis_Fiyat,urunler.gorsel As Gorsel,urunler.kategori As kategori_kod,kategoriler.kategoriad from urunler " +
+                "inner join kategoriler " +
+                "on " +
+                "urunler.kategori=kategoriler.kategoriid";
+            int sayac = 0;
+            if(urunAdı !=string.Empty)
             {
-                sorgu=sorgu+"urunAd=@p1";
+                sayac++;
+                if (sayac==1)
+                {
+                    sorgu=sorgu+" where";
+                }
+                sorgu =sorgu+" urunler.urunad=@p1";
+
             }
-            label3.Text=sorgu;
-            label2.Text=urunAdı;
+
+            if(alisFiyatBaslangic !=string.Empty)
+            {
+                sayac++;
+                if (sayac==1)
+                {
+                    sorgu=sorgu+" where";
+                }
+                if (sayac>1)
+                {
+                    sorgu=sorgu+" and";
+                }
+                sorgu=sorgu+" urunler.alisfiyat>=@p2";
+
+            }
+
+            if(alisFiyatBitis !=string.Empty)
+            {
+                sayac++;
+                if (sayac==1)
+                {
+                    sorgu=sorgu+" where";
+                }
+                if (sayac>1)
+                {
+                    sorgu=sorgu+" and";
+                }
+
+                sorgu=sorgu+" urunler.alisfiyat<=@p3";
+            }
+
+            if (satisFiyatBaslangic !=string.Empty)
+            {
+                sayac++;
+                if (sayac==1)
+                {
+                    sorgu=sorgu+" where";
+                }
+                if (sayac>1)
+                {
+                    sorgu=sorgu+" and";
+                }
+                sorgu=sorgu+" urunler.satisfiyat>=@p4";
+
+            }
+
+            if (satisFiyatBitis !=string.Empty)
+            {
+                sayac++;
+                if (sayac==1)
+                {
+                    sorgu=sorgu+" where";
+                }
+                if (sayac>1)
+                {
+                    sorgu=sorgu+" and";
+                }
+                sorgu=sorgu+" urunler.satisfiyat>=@p5";
+
+            }
+
+            if (kategoriBilgisi !="-1")
+            {
+                sayac++;
+                if (sayac==1)
+                {
+                    sorgu=sorgu+" where";
+                }
+                if (sayac>1)
+                {
+                    sorgu=sorgu+" and";
+                }
+                sorgu=sorgu+" urunler.kategori=@p6";
+            }
+
+            if(secili)
+            {
+                sayac++;
+                if (sayac==1)
+                {
+                    sorgu=sorgu+" where";
+                }
+                if (sayac>1)
+                {
+                    sorgu=sorgu+" and";
+                }
+                sorgu=sorgu+" urunler.stok> @p7";
+            }
+
+            sorgu=sorgu+ " order by urunler.urunad asc";
+
+
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sorgu, baglanti);
+            da.SelectCommand.Parameters.AddWithValue("@p1", urunAdı);
+
+            if (alisFiyatBaslangic!=string.Empty)
+            {
+                da.SelectCommand.Parameters.AddWithValue("@p2", int.Parse(alisFiyatBaslangic));
+            }
+
+            if (alisFiyatBitis!=string.Empty) 
+            { 
+                da.SelectCommand.Parameters.AddWithValue("@p3", int.Parse(alisFiyatBitis));
+            }
+           
+            if(satisFiyatBaslangic!=string.Empty)
+            {
+                da.SelectCommand.Parameters.AddWithValue("@p4", int.Parse(satisFiyatBaslangic));
+            }
+            
+            if(satisFiyatBitis!=string.Empty)
+            {
+                da.SelectCommand.Parameters.AddWithValue("@p5", int.Parse(satisFiyatBitis));
+            }
+
+            if (kategoriBilgisi!="-1")
+            {
+                da.SelectCommand.Parameters.AddWithValue("@p6", int.Parse(kategoriBilgisi));
+            }
+            if (secili)
+            {
+                da.SelectCommand.Parameters.AddWithValue("@p7", 0);
+            }
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            dataGridView1.DataSource= ds.Tables[0];
+
+            
+            
         }
         
 
         private void btnFiltre_Click(object sender, EventArgs e)
         {
-            Form frm4=new Form4(this);
-          
-            frm4.Show();
-            
 
-            
-            
-            
-            
-            
+          Form frm4=new Form4(this);
+            frm4.Show();
+           
 
         }
         

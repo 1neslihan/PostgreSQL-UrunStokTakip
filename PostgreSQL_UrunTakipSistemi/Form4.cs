@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace PostgreSQL_UrunTakipSistemi
 {
@@ -16,10 +18,18 @@ namespace PostgreSQL_UrunTakipSistemi
         {
             InitializeComponent();
         }
+        NpgsqlConnection baglanti = new NpgsqlConnection("server=localhost; port=5432; " +
+            "Database=dburunler; user Id=postgres; password=*****");
 
         private void Form4_Load(object sender, EventArgs e)
         {
-            
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter("select * from kategoriler order by kategoriid", baglanti);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            comKategori.DisplayMember="kategoriad";
+            comKategori.ValueMember="kategoriid";
+            comKategori.DataSource= dt;
+            comKategori.SelectedIndex=-1;
         }
         private Form1 mainForm = null;
         public Form4(Form callingForm)
@@ -30,19 +40,32 @@ namespace PostgreSQL_UrunTakipSistemi
 
         private void btnFiltre_Click(object sender, EventArgs e)
         {
-            //Form1 frm1=new Form1();
-            //Form pop=new Form1();
-            //pop.Hide();
-            //frm1.Hide();
-            //frm1.Show();
-            //frm1.ShowInTaskbar=true;
-            this.mainForm.urunAdı=txtUrunAd.Text.Trim().ToLower();
-            this.mainForm.kategoriBilgisi=comKategori.SelectedText.Trim().ToLower();
-            this.mainForm.alisFiyatBaslangic=Convert.ToInt32(txtAlisBaslangic.Text.Trim());
-            this.mainForm.alisFiyatBitis=Convert.ToInt32(txtAlisBitis.Text.Trim());
-            this.mainForm.satisFiyatBaslangic=Convert.ToInt32(txtSatisBaslangic.Text.Trim());
-            this.mainForm.satisFiyatBitis=Convert.ToInt32(txtSatisBitis.Text.Trim());
+            
+
+            this.mainForm.urunAdı=txtUrunAd.Text.Trim();
+            if(comKategori.SelectedValue==null)
+            {
+                this.mainForm.kategoriBilgisi="-1";
+            }
+            else
+            {
+                this.mainForm.kategoriBilgisi=comKategori.SelectedValue.ToString();
+            } 
+            this.mainForm.alisFiyatBaslangic=txtAlisBaslangic.Text.Trim();
+            this.mainForm.alisFiyatBitis=txtAlisBitis.Text.Trim();
+            this.mainForm.satisFiyatBaslangic=txtSatisBaslangic.Text.Trim();
+            this.mainForm.satisFiyatBitis=txtSatisBitis.Text.Trim();
+            if(chbox1.Checked) 
+            { 
+                this.mainForm.secili=true;
+            }
+            else
+                this.mainForm.secili= false;
+            
+            mainForm.BringToFront();
             mainForm.filtre();
+            //this.Close();
+            this.Dispose(true);
 
         }
     }

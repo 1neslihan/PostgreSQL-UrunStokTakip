@@ -47,9 +47,6 @@ namespace PostgreSQL_UrunTakipSistemi
             this.btnCopBosalt = new System.Windows.Forms.Button();
             this.btnKaliciSilme = new System.Windows.Forms.Button();
             this.dataGridView3 = new System.Windows.Forms.DataGridView();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
@@ -72,9 +69,6 @@ namespace PostgreSQL_UrunTakipSistemi
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.label4);
-            this.tabPage1.Controls.Add(this.label3);
-            this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.dataGridView2);
             this.tabPage1.Controls.Add(this.label8);
             this.tabPage1.Controls.Add(this.btnFiltre);
@@ -256,33 +250,6 @@ namespace PostgreSQL_UrunTakipSistemi
             this.dataGridView3.Size = new System.Drawing.Size(787, 327);
             this.dataGridView3.TabIndex = 0;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(27, 411);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 20);
-            this.label2.TabIndex = 22;
-            this.label2.Text = "label2";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(131, 411);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(53, 20);
-            this.label3.TabIndex = 23;
-            this.label3.Text = "label3";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(244, 411);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(53, 20);
-            this.label4.TabIndex = 24;
-            this.label4.Text = "label4";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
@@ -325,9 +292,6 @@ namespace PostgreSQL_UrunTakipSistemi
         private Button btnCopBosalt;
         private Button btnGeriYukle;
         private Label label1;
-        private Label label4;
-        private Label label3;
-        private Label label2;
     }
 }
 

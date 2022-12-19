@@ -38,7 +38,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.txtUrunAd = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.chbox1 = new System.Windows.Forms.CheckBox();
             this.comKategori = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.btnFiltre = new System.Windows.Forms.Button();
@@ -134,15 +134,15 @@
             this.label5.TabIndex = 8;
             this.label5.Text = "Ürün Adı:";
             // 
-            // checkBox1
+            // chbox1
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(469, 71);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(137, 24);
-            this.checkBox1.TabIndex = 12;
-            this.checkBox1.Text = "Stokta Olanlar";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.chbox1.AutoSize = true;
+            this.chbox1.Location = new System.Drawing.Point(469, 71);
+            this.chbox1.Name = "chbox1";
+            this.chbox1.Size = new System.Drawing.Size(137, 24);
+            this.chbox1.TabIndex = 12;
+            this.chbox1.Text = "Stokta Olanlar";
+            this.chbox1.UseVisualStyleBackColor = true;
             // 
             // comKategori
             // 
@@ -180,7 +180,7 @@
             this.Controls.Add(this.btnFiltre);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.comKategori);
-            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.chbox1);
             this.Controls.Add(this.txtUrunAd);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.txtSatisBitis);
@@ -213,7 +213,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtUrunAd;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox chbox1;
         private System.Windows.Forms.ComboBox comKategori;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button btnFiltre;

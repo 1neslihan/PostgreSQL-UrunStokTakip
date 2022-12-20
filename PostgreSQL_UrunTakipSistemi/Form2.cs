@@ -22,7 +22,7 @@ namespace PostgreSQL_UrunTakipSistemi
         {
             InitializeComponent();
         }
-
+        //Veritabanına bağlanmak için bağlantı anahtarı oluşturuldu.
         NpgsqlConnection baglanti = new NpgsqlConnection("server=localhost; port=5432; " +
            "Database=dburunler; user Id=postgres; password=*****");
    
@@ -30,14 +30,15 @@ namespace PostgreSQL_UrunTakipSistemi
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            
+            //burada kategorilerimizi bir comboboxta dropdown olarak göstermek için kategoriler tablosundan değerlerimizi çekiyoruz.
             NpgsqlDataAdapter da = new NpgsqlDataAdapter("select * from kategoriler", baglanti);
             DataTable dt = new DataTable();
             da.Fill(dt);
-            comKategori.DisplayMember="kategoriad";
-            comKategori.ValueMember="kategoriid";
+            comKategori.DisplayMember="kategoriad"; //kategori adları ekranda gösterilecek şekilde ayarlandı.
+            comKategori.ValueMember="kategoriid"; //kategoriidleri ise seçtiğimiz adın değeri olarak atandı.
             comKategori.DataSource= dt;
             
+            //kullanıcıya butonu ne amaçla kullanacağını açıklayan bir tooltip eklendi bunu nuget managerdan kütüphane olarak eklemelisiniz.
             ToolTip toolTip1=new ToolTip();
             toolTip1.AutoPopDelay = 8000;
             toolTip1.InitialDelay = 100;
@@ -50,54 +51,54 @@ namespace PostgreSQL_UrunTakipSistemi
        
         }
         
-
+        //veritabanına eleman eklemek için Ekle butonunun içi dolduruldu. Veriler textboxlardan,numericupdowndan ve comboboxdan alındı.
         private void btnEkle_Click(object sender, EventArgs e)
         {
             
-            NpgsqlCommand komut = new NpgsqlCommand("insert into urunler (urunad,stok,alisfiyat," +
+            NpgsqlCommand veriEkle= new NpgsqlCommand("insert into urunler (urunad,stok,alisfiyat," +
                 "satisfiyat,gorsel,kategori) values (@p1,@p2,@p3,@p4,@p5,@p6)", baglanti);
             
-       
-
             if (txtAd.Text != null)
             {
-                komut.Parameters.AddWithValue("@p1", txtAd.Text);
+                veriEkle.Parameters.AddWithValue("@p1", txtAd.Text);
 
             }
             else
             {
-                komut.Parameters.AddWithValue("@p1", DBNull.Value);
+                veriEkle.Parameters.AddWithValue("@p1", DBNull.Value);
             }
 
-            komut.Parameters.AddWithValue("@p2", int.Parse(numStok.Value.ToString()));
+            veriEkle.Parameters.AddWithValue("@p2", int.Parse(numStok.Value.ToString())); //bu bir numericupdown olduğu için default değeri 0 o yüzden direkt olarak eklenebilir.
 
             if (string.IsNullOrEmpty(txtAlisFiyat.Text))
             {
-                komut.Parameters.AddWithValue("@p3", DBNull.Value);
+                veriEkle.Parameters.AddWithValue("@p3", DBNull.Value);
             }
             else
             {
-                komut.Parameters.AddWithValue("@p3", double.Parse(txtAlisFiyat.Text));
+                veriEkle.Parameters.AddWithValue("@p3", double.Parse(txtAlisFiyat.Text));
             }
 
             if (string.IsNullOrEmpty(txtSatisFiyat.Text))
             {
-                komut.Parameters.AddWithValue("@p4", DBNull.Value);
+                veriEkle.Parameters.AddWithValue("@p4", DBNull.Value);
             }
             else
             {
-                komut.Parameters.AddWithValue("@p4", double.Parse(txtSatisFiyat.Text));
+                veriEkle.Parameters.AddWithValue("@p4", double.Parse(txtSatisFiyat.Text));
             }
 
-            komut.Parameters.AddWithValue("@p5", txtGorsel.Text);
-            komut.Parameters.AddWithValue("@p6", int.Parse(comKategori.SelectedValue.ToString()));
+            veriEkle.Parameters.AddWithValue("@p5", txtGorsel.Text);
+            veriEkle.Parameters.AddWithValue("@p6", int.Parse(comKategori.SelectedValue.ToString()));
             baglanti.Open();
-            komut.ExecuteNonQuery();
+            veriEkle.ExecuteNonQuery();
             baglanti.Close();
+
             DialogResult dialogresult = MessageBox.Show("Veri ekleme başarılı.Veri eklemeye devam etmek iste misiniz?"
                    , "Bilgi", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dialogresult == DialogResult.Yes)
             {
+                //eleman eklemesi yapıldıktan sonra textboxların içini temizliyoruz.
                 foreach (Control item in this.Controls)
                 {
                     if (item is TextBox)
@@ -118,7 +119,7 @@ namespace PostgreSQL_UrunTakipSistemi
         
         
    
-
+        //Yeni kategori ekleme/silme/güncelleme işlemleri için bizi ilgili forma götürecek butonun gövdesi dolduruldu.
         private void button1_Click(object sender, EventArgs e)
         {
             Form frm3=new Form3();

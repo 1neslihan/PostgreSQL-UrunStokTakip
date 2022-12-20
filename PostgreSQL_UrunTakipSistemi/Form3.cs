@@ -18,54 +18,44 @@ namespace PostgreSQL_UrunTakipSistemi
             InitializeComponent();
             FormClosing +=Form3_FormClosing;
         }
-
+         //bu form kapatıldıktan sonra form2nin yani eleman ekleme formunun yeniden ekrana gelmesi için oluşturulmuş bir çağrı.
         private void Form3_FormClosing(object sender, FormClosingEventArgs e)
         {
             Form pop = new Form2();
             pop.ShowDialog();
         }
-
+        //Veritabanına bağlanmak için bağlantı anahtarı oluşturuldu.
         NpgsqlConnection baglanti = new NpgsqlConnection("server=localhost; port=5432; " +
            "Database=dburunler; user Id=postgres; password=*****");
 
+        
         private void Form3_Load(object sender, EventArgs e)
         {
-            //baglanti.Open();
-            //NpgsqlDataAdapter da = new NpgsqlDataAdapter("select * from kategoriler", baglanti);
-            //DataTable dt = new DataTable();
-            //da.Fill(dt);
-            //baglanti.Close();
-            string sorgu = "select * from kategoriler";
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sorgu, baglanti);
-            DataSet ds = new DataSet();
-            da.Fill(ds);
-            dataGridView1.DataSource= ds.Tables[0];
-            dataGridView1.Columns["kategoriid"].ReadOnly=true;
-            dataGridView1.RowsDefaultCellStyle.BackColor = Color.Bisque;
-            dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
-            
 
+            Listele();
         }
 
-        
+        //silme/güncelleme/ekleme işlemlerinden sonra güncel tabloyu listelemek için.
+        //ayrıca form loadda çağrılıyor yani form açılırken kategoriler tablosunun ögeleri datagridview üstünde gösteriliyor.
         private void Listele()
         {
-            string sorgu = "select * from kategoriler";
+            string sorgu = "select * from kategoriler order by kategoriid";
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sorgu, baglanti);
             DataSet ds = new DataSet();
             da.Fill(ds);
             dataGridView1.DataSource= ds.Tables[0];
-            dataGridView1.Columns["kategoriid"].ReadOnly=true;
+            dataGridView1.Columns["kategoriid"].ReadOnly=true; //kategoriid otomatik arttırıldığı için kullanıcının onun üstünde işlem yapmasını istemiyorum. Bu sebeple sutun sadece readonly.
             dataGridView1.RowsDefaultCellStyle.BackColor = Color.Bisque;
             dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
             
             
         }
         
+        //kategori ekleme işlemi textbox üzerinden yapılıyor.Bunun için Ekle butonu dolduruldu.
         private void btnEkle_Click(object sender, EventArgs e)
         {
             baglanti.Open();
-            NpgsqlCommand komut = new NpgsqlCommand("insert into kategoriler (kategoriad) values (@p1)", baglanti);
+            NpgsqlCommand veriEkle = new NpgsqlCommand("insert into kategoriler (kategoriad) values (@p1)", baglanti);
             
             if (txtKategoriAd.Text =="")
             {
@@ -73,8 +63,8 @@ namespace PostgreSQL_UrunTakipSistemi
             }
             else
             {
-                komut.Parameters.AddWithValue("@p1", txtKategoriAd.Text);
-                komut.ExecuteNonQuery();
+                veriEkle.Parameters.AddWithValue("@p1", txtKategoriAd.Text);
+                veriEkle.ExecuteNonQuery();
             }
             
             baglanti.Close();
@@ -84,25 +74,25 @@ namespace PostgreSQL_UrunTakipSistemi
         }
   
         
-
+        //Silme işlemlerini yapan fonksiyonlar tanımlandı ayrıca idsi 20 olan bilinmeyen kategorinin silinmesi engellendi bu sayede programın istikrarı sağlandı.
         private void btnSil_Click(object sender, EventArgs e)
         {
             void KategoriSil(int selectedId)
             {
-                NpgsqlCommand komut3 = new NpgsqlCommand("delete from kategoriler where kategoriid=@p1", baglanti);
-                komut3.Parameters.AddWithValue("@p1", selectedId);
+                NpgsqlCommand kategoriSil = new NpgsqlCommand("delete from kategoriler where kategoriid=@p1", baglanti);
+                kategoriSil.Parameters.AddWithValue("@p1", selectedId);
                 baglanti.Open();
-                komut3.ExecuteNonQuery();
+                kategoriSil.ExecuteNonQuery();
                 baglanti.Close();
             }
             void KategoriUpdate(int selectedId)
             {
-                NpgsqlCommand komut2 = new NpgsqlCommand("update urunler set kategori=20 where kategori=@p1", baglanti);
+                NpgsqlCommand guncelle = new NpgsqlCommand("update urunler set kategori=20 where kategori=@p1", baglanti);
 
-                komut2.Parameters.AddWithValue("@p1", selectedId);
+                guncelle.Parameters.AddWithValue("@p1", selectedId);
                
                 baglanti.Open();
-                komut2.ExecuteNonQuery();
+                guncelle.ExecuteNonQuery();
                 baglanti.Close();
             }
 
@@ -127,12 +117,9 @@ namespace PostgreSQL_UrunTakipSistemi
                         else
                         {
                             MessageBox.Show("Bilinmeyen kategorisi silinemez!");
-                        }
-                     
+                        }  
                         
-                    }
-
-                    
+                    }  
                     Listele();
                 }
 
@@ -149,38 +136,50 @@ namespace PostgreSQL_UrunTakipSistemi
 
 
         }
-
+         // Burada diğer kısımlardan farklı olarak çoklu güncelleme özelliği koyulmadı. Kategori güncellenirken tek tek güncelleme yapılabilir.
         private void btnGuncelle_Click(object sender, EventArgs e)
         {
             NpgsqlCommand kategoriadDBGuncelle = new NpgsqlCommand("update kategoriler set kategoriad=@p1 where kategoriid=@p2", baglanti);
-           
-            foreach(DataGridViewRow upt3 in dataGridView1.SelectedRows)
-            {
-                
-
-                if (upt3.Cells[0].Value != null)
+            
+            foreach (DataGridViewRow upt3 in dataGridView1.SelectedRows)
+            {   
+                int id = Convert.ToInt32(upt3.Cells[0].Value);
+                if (id !=20)
                 {
-                    kategoriadDBGuncelle.Parameters.AddWithValue("@p2", upt3.Cells[0].Value);
+                    if (upt3.Cells[0].Value != null)
+                    {
+                        kategoriadDBGuncelle.Parameters.AddWithValue("@p2", upt3.Cells[0].Value);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Hatalı seçim", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                
+                    if(upt3.Cells[1].Value != null)
+                    {
+                        kategoriadDBGuncelle.Parameters.AddWithValue("@p1", upt3.Cells[1].Value);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Kategori ismi boş olamaz!", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+
+
+                    baglanti.Open();
+                    kategoriadDBGuncelle.ExecuteNonQuery();
+                    baglanti.Close();
+                    MessageBox.Show("Güncelleme Başarılı");
+                    Listele();
+
                 }
                 else
                 {
-                    MessageBox.Show("Hatalı seçim", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Bilinmeyen Kategorisine müdahale edilemez!");
+                    Listele();
                 }
+
                 
-                if(upt3.Cells[1].Value != null)
-                {
-                    kategoriadDBGuncelle.Parameters.AddWithValue("@p1", upt3.Cells[1].Value);
-                }
-                else
-                {
-                    MessageBox.Show("Kategori ismi boş olamaz!", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-
-
-                baglanti.Open();
-                kategoriadDBGuncelle.ExecuteNonQuery();
-                baglanti.Close();
-                Listele();
+                
             }
         }
     }

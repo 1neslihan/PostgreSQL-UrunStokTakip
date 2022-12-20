@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,17 +20,14 @@ namespace PostgreSQL_UrunTakipSistemi
             InitializeComponent();
        
         }
-        //private Form4 filtreleForm = null;
-        //public Form1(Form callingForm)
-        //{
-        //    filtreleForm = callingForm as Form4;
-        //    InitializeComponent();
-        //}
-
+        //Datagridviewlarımızın tümünde property üzerinden SelectMode=FullRowSelect,AutoSizeColumnsMode=Fill olarak seçildi.
+        
+        //Veri tabanına bağlanmak için bağlanti anahtarı oluşturuldu.
         NpgsqlConnection baglanti = new NpgsqlConnection("server=localhost; port=5432; " +
             "Database=dburunler; user Id=postgres; password=*****");
         
-        
+        //Program başlangıcında çalışmasını istediğimiz ögeleri load event'a atabiliriz. 
+        //Ben listele butonunun içindeki kodları pek çok yerde kullandığım için diretk olarak load eventda onu çağırdım.
         private void Form1_Load(object sender, EventArgs e)
         {
           
@@ -37,8 +35,11 @@ namespace PostgreSQL_UrunTakipSistemi
 
         }
 
+        //Veri tabanındaki tabloları datagridviewler üzerinde göstermek için Listele butonunun click eventını dolduruyorum.
         private void btnListele_Click(object sender, EventArgs e)
         {
+            //urunler isimli tablodan urunlerinid'si,adı,stok miktarı,alış ve satış fiyatları varsa resimlerinin yolları,
+            //kategori kodları ve ilişkili olduğu kategoriler tablosundanda kategori adlarını listeliyorum.
             string sorgu = "select urunler.urunid,urunler.urunad As Urun_Ad, urunler.stok, urunler.alisfiyat As Alis_Fiyat," +
                 "urunler.satisfiyat As Satis_Fiyat,urunler.gorsel As Gorsel,urunler.kategori As kategori_kod,kategoriler.kategoriad from urunler " +
                 "inner join kategoriler " +
@@ -49,21 +50,25 @@ namespace PostgreSQL_UrunTakipSistemi
             DataSet ds = new DataSet();
             da.Fill(ds);
             dataGridView1.DataSource= ds.Tables[0];
-            dataGridView1.Columns[0].Visible = false;
-            dataGridView1.Columns["kategoriad"].ReadOnly=true;
-            dataGridView1.RowsDefaultCellStyle.BackColor = Color.Bisque;
+            dataGridView1.Columns[0].Visible = false; //urunid bloğunun datagridviewda görünmesini istemediğim için false yaptım.
+            dataGridView1.Columns["kategoriad"].ReadOnly=true; //Ayrıca güncelleme yaparken kategoriad bloğunun değiştirilmemesi için bu blok sadece readonly olarak ayarlandı.
+            dataGridView1.RowsDefaultCellStyle.BackColor = Color.Bisque; //Biraz görsellik eklemek için satırların arka planını renklendirdim.
             dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
 
+
+            //kategoriler isimli tablodan kategoriid ve kategoriad alanlarını listeliyorum.
             string sorgu2 = "select kategoriid As Kategori_Kod,kategoriad from kategoriler order by kategoriid";
             NpgsqlDataAdapter da2=new NpgsqlDataAdapter(sorgu2, baglanti);
             DataSet ds2 = new DataSet();
             da2.Fill(ds2);
             dataGridView2.DataSource= ds2.Tables[0];
-            dataGridView2.Columns["Kategori_Kod"].ReadOnly=true;
+            dataGridView2.Columns["Kategori_Kod"].ReadOnly=true; //Kategori güncelleme işlemleri buradaki datagridview üzerinden yapılmayacağı için satırları readonly olarak ayarladım.
             dataGridView2.Columns["kategoriad"].ReadOnly=true;
-            dataGridView2.RowsDefaultCellStyle.BackColor = Color.Bisque;
+            dataGridView2.RowsDefaultCellStyle.BackColor = Color.Bisque; 
             dataGridView2.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
 
+
+            //silinen urunler adlı tablodan listeleme yapıyoruz. Bu benim çöp kutusu listem.
             string sorgu3 = "select * from silinenurunler";
             NpgsqlDataAdapter da3 = new NpgsqlDataAdapter(sorgu3, baglanti);
             DataSet ds3 = new DataSet();
@@ -72,11 +77,11 @@ namespace PostgreSQL_UrunTakipSistemi
             dataGridView3.Columns[6].Visible = false;
             dataGridView3.RowsDefaultCellStyle.BackColor = Color.AliceBlue;
             dataGridView3.AlternatingRowsDefaultCellStyle.BackColor = Color.Beige;
-
-         
-            
+        
 
         }
+
+        //Yeni eleman eklemek için Ekle butonunun içi doldurulacak bu işlem yeni bir formda yapılıyor o yüzden burda form çağırıldı.
         private void btnEkle_Click(object sender, EventArgs e)
         {
             Form2 frm= new Form2();
@@ -84,21 +89,24 @@ namespace PostgreSQL_UrunTakipSistemi
             btnListele_Click(sender,e);
         }
 
+        //Silme işlemlerimiz için Sil butonunun içi dolduruluyor.
         private void btnSil_Click(object sender, EventArgs e)
         {
-
+            //Silinecek ögeler urunidlerine göre belirleniyor bunuda kayıtSil isimli fonksiyonumuzla gerçekleştiriyorum.
             void KayıtSil(int selectedId)
             {
-                NpgsqlCommand komut3 = new NpgsqlCommand("delete from urunler where urunid=@p1", baglanti);
-                komut3.Parameters.AddWithValue("@p1", selectedId);
+                NpgsqlCommand sil = new NpgsqlCommand("delete from urunler where urunid=@p1", baglanti);
+                sil.Parameters.AddWithValue("@p1", selectedId);
                 baglanti.Open();
-                komut3.ExecuteNonQuery();
+                sil.ExecuteNonQuery();
                 baglanti.Close();
             }
+
+            //Kayıtlarımız silinmeden önce birer kopyaları çöp kutusuna taşınıyor böylece yanlışlıkla sildiğimiz ürünleri geri getirebiliriz.
             void KayıtEkle(string selectedAd, int selectedStok, int selectedAlisFiyat, int selectedSatisFiyat,
                 string selectedGorsel, int selectedKategori)
             {
-                NpgsqlCommand komut2 = new NpgsqlCommand("insert into silinenUrunler (" +
+                NpgsqlCommand copEkle = new NpgsqlCommand("insert into silinenUrunler (" +
                     "silinenurunad," +
                     "silinenstok," +
                     "silinenalisfiyat," +
@@ -113,31 +121,40 @@ namespace PostgreSQL_UrunTakipSistemi
                     "@p5," +
                     "@p6 )", baglanti);
                 
-                komut2.Parameters.AddWithValue("@p1", selectedAd);
-                komut2.Parameters.AddWithValue("@p2", selectedStok);
-            
-                if (selectedAlisFiyat==-1)
+                copEkle.Parameters.AddWithValue("@p1", selectedAd);
+
+                if (selectedStok==-1)
                 {
-                    komut2.Parameters.AddWithValue("@p3", DBNull.Value);
+                    copEkle.Parameters.AddWithValue("@p2", DBNull.Value);
                 }
                 else
                 {
-                    komut2.Parameters.AddWithValue("@p3", selectedAlisFiyat);
+                    copEkle.Parameters.AddWithValue("@p2", selectedStok);
+                }
+                
+            
+                if (selectedAlisFiyat==-1)
+                {
+                    copEkle.Parameters.AddWithValue("@p3", DBNull.Value);
+                }
+                else
+                {
+                    copEkle.Parameters.AddWithValue("@p3", selectedAlisFiyat);
                 }
 
                 if (selectedSatisFiyat==-1)
                 {
-                    komut2.Parameters.AddWithValue("@p4", DBNull.Value);
+                    copEkle.Parameters.AddWithValue("@p4", DBNull.Value);
                 }
                 else
                 {
-                    komut2.Parameters.AddWithValue("@p4", selectedSatisFiyat);
+                    copEkle.Parameters.AddWithValue("@p4", selectedSatisFiyat);
                 }
 
-                komut2.Parameters.AddWithValue("@p5", selectedGorsel);
-                komut2.Parameters.AddWithValue("@p6", selectedKategori);
+                copEkle.Parameters.AddWithValue("@p5", selectedGorsel);
+                copEkle.Parameters.AddWithValue("@p6", selectedKategori);
                 baglanti.Open();
-                komut2.ExecuteNonQuery();
+                copEkle.ExecuteNonQuery();
                 baglanti.Close();
             }
             
@@ -155,8 +172,17 @@ namespace PostgreSQL_UrunTakipSistemi
                     {
                         int selectedId = Convert.ToInt32(del.Cells[0].Value);
                         string selectedAd = Convert.ToString(del.Cells[1].Value);
-                        int selectedStok = Convert.ToInt32(del.Cells[2].Value);     
-                        int selectedAlisFiyat;// int selectedAlisFiyat = Convert.ToInt32(drow.Cells[3].Value);
+                        int selectedStok;
+                        if (del.Cells[2].Value==DBNull.Value) //int ögeler null değer alamayacağı ilgili alanın veri tabanında null olduğu durumlar için -1 ataması yapıyorum. 
+                        {                                     //benim verilerin negatif değer alamayacağından fonksiyonda -1 tespit edilen yer veri tabanında null olacak şekilde dolduruluyor.
+                            selectedStok=-1;
+                        }
+                        else
+                        {
+                            selectedStok=Convert.ToInt32(del.Cells[2].Value);
+                        }
+                             
+                        int selectedAlisFiyat;
                         if (del.Cells[3].Value==DBNull.Value)
                         {
                             selectedAlisFiyat=-1;
@@ -166,7 +192,7 @@ namespace PostgreSQL_UrunTakipSistemi
                             selectedAlisFiyat=Convert.ToInt32(del.Cells[3].Value);
                         }
 
-                        int selectedSatisFiyat;//int selectedSatisFiyat = Convert.ToInt32(drow.Cells[4].Value);
+                        int selectedSatisFiyat;
                         if(del.Cells[4].Value== DBNull.Value)
                         {
                             selectedSatisFiyat=-1;
@@ -178,7 +204,16 @@ namespace PostgreSQL_UrunTakipSistemi
                      
                         
                         string selectedGorsel = Convert.ToString(del.Cells[5].Value);
-                        int selectedKategori = Convert.ToInt32(del.Cells[6].Value);
+                        int selectedKategori;
+                        if (del.Cells[6].Value==DBNull.Value)
+                        {
+                            selectedKategori=20;
+                        }
+                        else
+                        {
+                            selectedKategori=Convert.ToInt32(del.Cells[6].Value);
+                        }
+                        
 
                         KayıtEkle(selectedAd, selectedStok, selectedAlisFiyat, selectedSatisFiyat, selectedGorsel, selectedKategori);
                         KayıtSil(selectedId);
@@ -200,90 +235,120 @@ namespace PostgreSQL_UrunTakipSistemi
             }
         }
 
+        //verileri güncellemek için Guncelle butonunun içi dolduruluyor.
         private void btnGuncelle_Click(object sender, EventArgs e)
         {
+            //Kayıtları fonkyion yardımıyla güncelliyorum.
+            void kayitGuncelle(int selectedId,string selectedUrunad,int selectedStok,
+                int selectedAlisFiyat,int selectedSatisFiyat,string selectedGorsel,int selectedKategori)
+            {
+                NpgsqlCommand guncelle = new NpgsqlCommand("Update urunler set urunad=@p1, stok=@p2, alisfiyat=@p3," +
+                    "satisfiyat=@p4, gorsel=@p5, kategori=@p6 where urunid=@p7",baglanti);
+
+                guncelle.Parameters.AddWithValue("@p7", selectedId);
+                guncelle.Parameters.AddWithValue("@p1", selectedUrunad);
+
+                if (selectedStok==-1)
+                {
+                    guncelle.Parameters.AddWithValue("@p2", DBNull.Value);
+                }
+                else
+                {
+                    guncelle.Parameters.AddWithValue("@p2", selectedStok);
+                }
+
+                if (selectedAlisFiyat==-1)
+                {
+                    guncelle.Parameters.AddWithValue("@p3", DBNull.Value);
+                }
+                else
+                {
+                    guncelle.Parameters.AddWithValue("@p3", selectedAlisFiyat);
+                }
+
+                if (selectedSatisFiyat==-1)
+                {
+                    guncelle.Parameters.AddWithValue("@p4", DBNull.Value);
+                }
+                else
+                {
+                    guncelle.Parameters.AddWithValue("@p4", selectedSatisFiyat);
+                }
+
+                guncelle.Parameters.AddWithValue("@p5", selectedGorsel);
+                guncelle.Parameters.AddWithValue("@p6", selectedKategori);
+
+                baglanti.Open();
+                //burada try-catch kullanma sebebim kullanıcı kategoriler tablosunda olmayan bir kategori girişi yapmaya çalışırsa sistemin onu durdurmasını sağlamak için.
+                try
+                {
+                    guncelle.ExecuteNonQuery();
+                    MessageBox.Show("işlem başarılı");
+                }
+                catch(NpgsqlException)
+                {
+                    MessageBox.Show("Geçersiz kategori kodu girildi. Güncelleme işlemi iptal edildi.");
+                }
+
+                baglanti.Close();
+
+            }
+
 
             foreach (DataGridViewRow upt in dataGridView1.SelectedRows)
             {
-                NpgsqlCommand komut4 = new NpgsqlCommand("Update urunler set urunad=@p1, stok=@p2, alisfiyat=@p3," +
-                    "satisfiyat=@p4, gorsel=@p5, kategori=@p6 where urunid=@p7",baglanti);
-
-                if (upt.Cells[1].Value !=null)
+                int selectedId =Convert.ToInt32(upt.Cells[0].Value);
+                string selectedUrunAd =Convert.ToString(upt.Cells[1].Value);
+                int selectedStok;
+                if (upt.Cells[2].Value==DBNull.Value)
                 {
-                    komut4.Parameters.AddWithValue("@p1", upt.Cells[1].Value);
+                    selectedStok=-1;
                 }
                 else
                 {
-                    komut4.Parameters.AddWithValue("@p1",DBNull.Value);
+                    selectedStok=Convert.ToInt32(upt.Cells[2].Value);
                 }
-
-                if (upt.Cells[2].Value !=null)
+                
+                int selectedAlisFiyat;
+                if (upt.Cells[3].Value==DBNull.Value)
                 {
-                    komut4.Parameters.AddWithValue("@p2", upt.Cells[2].Value);
+                    selectedAlisFiyat=-1;
                 }
                 else
                 {
-                    komut4.Parameters.AddWithValue("@p2", DBNull.Value);
+                    selectedAlisFiyat=Convert.ToInt32(upt.Cells[3].Value);
                 }
-
-                if (upt.Cells[3].Value !=null)
+                int selectedSatisFiyat;
+                if (upt.Cells[4].Value==DBNull.Value)
                 {
-                    komut4.Parameters.AddWithValue("@p3", upt.Cells[3].Value);
+                    selectedSatisFiyat=-1;
                 }
                 else
                 {
-                    komut4.Parameters.AddWithValue("@p3", DBNull.Value);
+                    selectedSatisFiyat=Convert.ToInt32(upt.Cells[4].Value);
                 }
 
-                if (upt.Cells[4].Value !=null)
+                string selectedGorsel = Convert.ToString(upt.Cells[5].Value);
+                int selectedKategori;
+
+                if (upt.Cells[6].Value==DBNull.Value)
                 {
-                    komut4.Parameters.AddWithValue("@p4", upt.Cells[4].Value);
+                    selectedKategori=20;
                 }
                 else
                 {
-                    komut4.Parameters.AddWithValue("@p4", DBNull.Value);
+                    selectedKategori=Convert.ToInt32(upt.Cells[6].Value);
+
                 }
 
-                if (upt.Cells[5].Value !=null)
-                {
-                    komut4.Parameters.AddWithValue("@p5", upt.Cells[5].Value);
-                }
-                else
-                {
-                    komut4.Parameters.AddWithValue("@p5", DBNull.Value);
-                }
-
-                if (upt.Cells[6].Value !=null)
-                {
-                    komut4.Parameters.AddWithValue("@p6", upt.Cells[6].Value);
-                }
-                else
-                {
-                    komut4.Parameters.AddWithValue("@p6", DBNull.Value);
-                }
-
-                if (upt.Cells[0].Value !=null)
-                {
-                    komut4.Parameters.AddWithValue("@p7", upt.Cells[0].Value);
-                }
-                else
-                {
-                    komut4.Parameters.AddWithValue("@p7", DBNull.Value);
-                }
-                baglanti.Open();
-                komut4.ExecuteNonQuery();
-                baglanti.Close();
+                kayitGuncelle(selectedId, selectedUrunAd, selectedStok, selectedAlisFiyat, selectedSatisFiyat, selectedGorsel, selectedKategori);
             }
             
-            MessageBox.Show("işlem başarılı");
-            btnListele_Click(sender, e);
+            btnListele_Click(sender, e); //güncelleme tamamlandığında yeni durum listelenmesi için listele butonu aktifleştirildi.
            
         }
-
-        
-
        
-
+        //Çöp kutusundaki tüm ögeleri silmek için Copbosalt butonunun içi dolduruldu.
         private void btnCopBosalt_Click(object sender, EventArgs e)
         {
             DialogResult dialogresult = MessageBox.Show("Çöp kutusunu boşaltmak istediğinize emin misiniz? Bu işlem geri alınamaz!"
@@ -305,6 +370,7 @@ namespace PostgreSQL_UrunTakipSistemi
 
         }
 
+        //Seçilen satırların cop kutusundan silinmesi için kaliciSilme butonunun içi dolduruldu.
         private void btnKaliciSilme_Click(object sender, EventArgs e)
         {
             void KayıtSil(int selectedId)
@@ -346,20 +412,21 @@ namespace PostgreSQL_UrunTakipSistemi
 
         }
 
+        //Urunler listesine geri yüklemek istediğimiz ögeler için geri yükleme butonunun içi dolduruldu.
         private void btnGeriYukle_Click(object sender, EventArgs e)
         {
             void KayıtSil(int selectedId)
             {
-                NpgsqlCommand komut6 = new NpgsqlCommand("delete from silinenurunler where silinenurunid=@p1", baglanti);
-                komut6.Parameters.AddWithValue("@p1", selectedId);
+                NpgsqlCommand sil = new NpgsqlCommand("delete from silinenurunler where silinenurunid=@p1", baglanti);
+                sil.Parameters.AddWithValue("@p1", selectedId);
                 baglanti.Open();
-                komut6.ExecuteNonQuery();
+                sil.ExecuteNonQuery();
                 baglanti.Close();
             }
             void KayıtEkle(string selectedAd, int selectedStok, int selectedAlisFiyat, int selectedSatisFiyat,
                 string selectedGorsel, int selectedKategori)
             {
-                NpgsqlCommand komut5 = new NpgsqlCommand("insert into urunler (" +
+                NpgsqlCommand geriYukle = new NpgsqlCommand("insert into urunler (" +
                     "urunad," +
                     "stok," +
                     "alisfiyat," +
@@ -374,35 +441,45 @@ namespace PostgreSQL_UrunTakipSistemi
                     "@p5," +
                     "@p6)", baglanti);
 
-                komut5.Parameters.AddWithValue("@p1", selectedAd);
-                komut5.Parameters.AddWithValue("@p2", selectedStok);
+                geriYukle.Parameters.AddWithValue("@p1", selectedAd);
 
+                if (selectedStok==-1)
+                {
+                    geriYukle.Parameters.AddWithValue("@p2", DBNull.Value);
+                }
+
+                else
+                {
+                    geriYukle.Parameters.AddWithValue("@p2", selectedStok);
+                }
+                
                 if (selectedAlisFiyat==-1)
                 {
-                    komut5.Parameters.AddWithValue("@p3", DBNull.Value);
+                    geriYukle.Parameters.AddWithValue("@p3", DBNull.Value);
                 }
                 else
                 {
-                    komut5.Parameters.AddWithValue("@p3", selectedAlisFiyat);
+                    geriYukle.Parameters.AddWithValue("@p3", selectedAlisFiyat);
                 }
 
                 if (selectedSatisFiyat==-1)
                 {
-                    komut5.Parameters.AddWithValue("@p4", DBNull.Value);
+                    geriYukle.Parameters.AddWithValue("@p4", DBNull.Value);
                 }
                 else
                 {
-                    komut5.Parameters.AddWithValue("@p4", selectedSatisFiyat);
+                    geriYukle.Parameters.AddWithValue("@p4", selectedSatisFiyat);
                 }
 
-                komut5.Parameters.AddWithValue("@p5", selectedGorsel);
-                komut5.Parameters.AddWithValue("@p6", selectedKategori);
+                geriYukle.Parameters.AddWithValue("@p5", selectedGorsel);
+                geriYukle.Parameters.AddWithValue("@p6", selectedKategori);
 
                 baglanti.Open();
-                komut5.ExecuteNonQuery(); 
+                geriYukle.ExecuteNonQuery(); 
                 baglanti.Close();
             }
 
+            //Sildiğimiz bir ürünü geri yüklerken onun kategorisinin hala sistemde olup olmadığını kontrol ediyoruz. Eğer kategori artık bulunmuyorsa ürün bilinmeyen kategorisi altında geri yükleniyor.
             int kategoriKarsilastir(int selectedKategori)
             {
                 NpgsqlCommand karsilastir = new NpgsqlCommand("select silinenurunad from silinenurunler s " +
@@ -412,7 +489,7 @@ namespace PostgreSQL_UrunTakipSistemi
 
                 karsilastir.ExecuteScalar();
                 if ((string)karsilastir.ExecuteScalar()==null)
-                    selectedKategori=20;
+                    selectedKategori=20; //bilinmeyen kategorisinin id'si
                 baglanti.Close();
                 return selectedKategori;
             }
@@ -424,7 +501,17 @@ namespace PostgreSQL_UrunTakipSistemi
                 {
                     int selectedId = Convert.ToInt32(restore.Cells[6].Value);
                     string selectedAd = Convert.ToString(restore.Cells[0].Value);
-                    int selectedStok = Convert.ToInt32(restore.Cells[1].Value);
+
+                    int selectedStok;
+                    if (restore.Cells[1].Value==DBNull.Value)
+                    {
+                        selectedStok=-1;
+                    }
+                    else
+                    {
+                        selectedStok=Convert.ToInt32(restore.Cells[1].Value);
+                    }
+                    
                     int selectedAlisFiyat;  
                     if (restore.Cells[2].Value==DBNull.Value)
                     {
@@ -447,8 +534,7 @@ namespace PostgreSQL_UrunTakipSistemi
 
 
                     string selectedGorsel = Convert.ToString(restore.Cells[4].Value);
-
-                    
+ 
                     int selectedKategori = Convert.ToInt32(restore.Cells[5].Value);
                     
                     selectedKategori=kategoriKarsilastir(selectedKategori);
@@ -468,6 +554,7 @@ namespace PostgreSQL_UrunTakipSistemi
 
         }
 
+        //Filtreleme işlemi yaparken başka bir form içindeki değişkenlerden değer alıyoruz bunun için public değişkenler tanımladım.
         public string alisFiyatBaslangic { get; set; }
         public string alisFiyatBitis { get; set; }
         public string satisFiyatBaslangic { get; set; }
@@ -477,7 +564,7 @@ namespace PostgreSQL_UrunTakipSistemi
         public bool secili { get; set; }
         
 
-      
+      //filtre fonksiyonu form4 de doldurulan verilere göre sql sorgusunu oluşturuyor. Daha sonra oluşturulan sorguya göre parametleri atayarak filtreleme sorgusunu çalıştırıyor.
         public void filtre()
         {
            
@@ -486,8 +573,8 @@ namespace PostgreSQL_UrunTakipSistemi
                 "inner join kategoriler " +
                 "on " +
                 "urunler.kategori=kategoriler.kategoriid";
-            int sayac = 0;
-            if(urunAdı !=string.Empty)
+            int sayac = 0; //and ve where gibi sorguyu oluşturacak ifadelerin eklenmesi için oluşturulan sayac.
+            if(urunAdı !=string.Empty) //örneğin form4de urun adına göre filtre yapılacaksa sorguya yeni alan ekleniyor.
             {
                 sayac++;
                 if (sayac==1)
@@ -498,7 +585,7 @@ namespace PostgreSQL_UrunTakipSistemi
 
             }
 
-            if(alisFiyatBaslangic !=string.Empty)
+            if(alisFiyatBaslangic !=string.Empty) //Verilen değerden büyük olanları listeler. Belirli bir aralıkta listeleme yapmak için hem başlangıç hemde bitiş değeri doldurulmalı.
             {
                 sayac++;
                 if (sayac==1)
@@ -513,7 +600,7 @@ namespace PostgreSQL_UrunTakipSistemi
 
             }
 
-            if(alisFiyatBitis !=string.Empty)
+            if(alisFiyatBitis !=string.Empty) //Verilen değerden küçük olanları listeler.Belirli bir aralıkta listeleme yapmak için hem başlangıç hemde bitiş değeri doldurulmalı.
             {
                 sayac++;
                 if (sayac==1)
@@ -558,7 +645,7 @@ namespace PostgreSQL_UrunTakipSistemi
 
             }
 
-            if (kategoriBilgisi !="-1")
+            if (kategoriBilgisi !="-1") //bir dropdown listten çekilen eleman olduğu için -1 gelmesi durumu seçili eleman olmadığına işaret eder. Bu durumda sorguya ona göre ekleme yapılır.
             {
                 sayac++;
                 if (sayac==1)
@@ -572,7 +659,7 @@ namespace PostgreSQL_UrunTakipSistemi
                 sorgu=sorgu+" urunler.kategori=@p6";
             }
 
-            if(secili)
+            if(secili) //bu bir checkbox için oluşturulmuş bool yapısı true dönmesi durumunda sorguya ilgili ekleme yapılır.
             {
                 sayac++;
                 if (sayac==1)
@@ -589,12 +676,15 @@ namespace PostgreSQL_UrunTakipSistemi
             sorgu=sorgu+ " order by urunler.urunad asc";
 
 
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sorgu, baglanti);
-            da.SelectCommand.Parameters.AddWithValue("@p1", urunAdı);
-
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sorgu, baglanti); //dataadaptera oluşturulan sorgu veriliyor.Hiç bir filtre yoksa ürünler alfabetik olarak sıralı şekilde listelenir.
+            if (urunAdı!=string.Empty)
+            {
+                da.SelectCommand.Parameters.AddWithValue("@p1", urunAdı);
+            }
+            
             if (alisFiyatBaslangic!=string.Empty)
             {
-                da.SelectCommand.Parameters.AddWithValue("@p2", int.Parse(alisFiyatBaslangic));
+                da.SelectCommand.Parameters.AddWithValue("@p2", int.Parse(alisFiyatBaslangic)); 
             }
 
             if (alisFiyatBitis!=string.Empty) 
@@ -622,20 +712,15 @@ namespace PostgreSQL_UrunTakipSistemi
             }
             DataSet ds = new DataSet();
             da.Fill(ds);
-            dataGridView1.DataSource= ds.Tables[0];
-
-            
-            
+            dataGridView1.DataSource= ds.Tables[0];    
         }
         
-
+        //filtreleme butonunun içi dolduruluyor. Form4 çağırılıyor bu sayede içindeki verileri doldurup çekebiliriz.
         private void btnFiltre_Click(object sender, EventArgs e)
         {
 
           Form frm4=new Form4(this);
             frm4.Show();
-           
-
         }
         
     }

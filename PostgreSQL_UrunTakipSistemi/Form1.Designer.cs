@@ -247,6 +247,7 @@ namespace PostgreSQL_UrunTakipSistemi
             this.dataGridView3.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.dataGridView3.RowHeadersWidth = 51;
             this.dataGridView3.RowTemplate.Height = 24;
+            this.dataGridView3.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView3.Size = new System.Drawing.Size(787, 327);
             this.dataGridView3.TabIndex = 0;
             // 

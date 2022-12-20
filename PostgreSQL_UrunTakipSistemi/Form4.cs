@@ -18,9 +18,12 @@ namespace PostgreSQL_UrunTakipSistemi
         {
             InitializeComponent();
         }
+
+        //Veritabanına bağlanmak için bağlantı anahtarı oluşturuldu.
         NpgsqlConnection baglanti = new NpgsqlConnection("server=localhost; port=5432; " +
             "Database=dburunler; user Id=postgres; password=*****");
 
+        //Kategoriler form açıldığında listelenmesi için bilgiler tablodan comboboxa çekiliyor.
         private void Form4_Load(object sender, EventArgs e)
         {
             NpgsqlDataAdapter da = new NpgsqlDataAdapter("select * from kategoriler order by kategoriid", baglanti);
@@ -29,8 +32,10 @@ namespace PostgreSQL_UrunTakipSistemi
             comKategori.DisplayMember="kategoriad";
             comKategori.ValueMember="kategoriid";
             comKategori.DataSource= dt;
-            comKategori.SelectedIndex=-1;
+            comKategori.SelectedIndex=-1; //otomatik olarak hiçbir elemanın seçili olmaması için -1 yapıldı.
         }
+
+        //Bu form açıldığı zaman her filtrele butonuna bastığımızda yeni bir form1 açmasını önlemek için tanımlanan değişken ve fonksiyon.
         private Form1 mainForm = null;
         public Form4(Form callingForm)
         {
@@ -38,10 +43,9 @@ namespace PostgreSQL_UrunTakipSistemi
             InitializeComponent();
         }
 
+        //form4 de textbox, combobox ve checkboxdaki verileri form1'e gönderen fonksiyon.
         private void btnFiltre_Click(object sender, EventArgs e)
         {
-            
-
             this.mainForm.urunAdı=txtUrunAd.Text.Trim();
             if(comKategori.SelectedValue==null)
             {
@@ -62,10 +66,8 @@ namespace PostgreSQL_UrunTakipSistemi
             else
                 this.mainForm.secili= false;
             
-            mainForm.BringToFront();
-            mainForm.filtre();
-            //this.Close();
-            this.Dispose(true);
+            mainForm.filtre(); //form1deki listeyi güncellemek için form1deki fonksiyon çağırıldı.
+            this.Dispose(true);//form4ü kapatıyor.
 
         }
     }
